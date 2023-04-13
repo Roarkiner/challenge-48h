@@ -1,10 +1,10 @@
 # ☕ YCoffee
 
-L'objectif de **_YCoffe_** est d'informer les étudiants du campus d'Ynov sur le status de la machine à café via une application, informant si la machine à café est opérationnel ou non.
+L'objectif de **_YCoffe_** est d'informer les étudiants du campus d'Ynov sur le statut de la machine à café via une application, informant si la machine à café est opérationnelle ou non.
 
 Les caractéristiques sont les suivantes : [features](#-features)
 
-Ce projet est en lien avec le Challenge 48h.
+Ce projet est en lien avec le challenge 48h
 
 #
 
@@ -47,6 +47,6 @@ Ce projet est en lien avec le Challenge 48h.
 
 ### install all dependencies
 
-```sh
+```txt
 Lien de l'apk : 
 ```
