@@ -45,8 +45,6 @@ Ce projet est en lien avec le challenge 48h
 
 ## 🏗️ `Getting started`
 
-### install all dependencies
-
 ```txt
 Lien de l'apk : 
 ```
