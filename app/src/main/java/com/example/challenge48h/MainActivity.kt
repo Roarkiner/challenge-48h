@@ -1,5 +1,6 @@
 package com.example.challenge48h
 
+import MachineWebSocketListener
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import androidx.core.content.ContextCompat;
@@ -14,45 +15,29 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-    private val machineStatusCheckManager: MachineStatusCheckManager = MachineStatusCheckManager(this)
-    private var coffeeMachineStatus: Int = 0
-    private lateinit var handler: Handler
-    private lateinit var runnable: Runnable
+    private var coffeeMachineStatus: Boolean = true
     private var isActivityActive: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        coffeeMachineStatus = machineStatusCheckManager.checkMachineStatus()
-        machineStatusCheckManager.createDataFileIfDoesntExist(coffeeMachineStatus)
+        val request = Request.Builder()
+            .url("ws://192.168.78.102:8999")
+            .build()
+
+        val listener = MachineWebSocketListener(this)
+        val client = OkHttpClient()
+        val webSocket = client.newWebSocket(request, listener)
 
         setLayoutStyleForCurrentStatus()
         createNotificationChannel()
-
-        handler = Handler(Looper.getMainLooper())
-        runnable = Runnable {
-            checkIfStatusHasChanged()
-            handler.postDelayed(runnable, 2000)
-        }
-
-        handler.post(runnable)
-    }
-
-    private fun checkIfStatusHasChanged() {
-        val newStatus: Int? = machineStatusCheckManager.checkIfStatusChanged()
-        if(newStatus != null){
-            coffeeMachineStatus = newStatus
-            if(isActivityActive){
-                setLayoutStyleForCurrentStatus()
-            } else {
-                showNotification()
-            }
-        }
     }
 
     private fun setLayoutStyleForCurrentStatus(){
@@ -62,7 +47,7 @@ class MainActivity : AppCompatActivity() {
 
         startRotationAnimation(mainIcon)
 
-        if(coffeeMachineStatus == 1){
+        if(coffeeMachineStatus){
             mainContainer.setBackgroundColor(ContextCompat.getColor(this, R.color.green))
             mainIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_coffee))
             mainStatusText.text = "La machine a café fonctionne"
@@ -78,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         notificationManager.cancelAll()
         var notifIcon = R.drawable.ic_coffee_invalid
         var notifDesc = "La machine a café est en panne"
-        if(coffeeMachineStatus == 1){
+        if(coffeeMachineStatus){
             notifIcon = R.drawable.ic_coffee
             notifDesc = "La machine a café est de nouveau opérationnelle"
         }
@@ -109,6 +94,19 @@ class MainActivity : AppCompatActivity() {
         imageView.animation = rotationAnimation
     }
 
+    fun onNewStatusReceived(newStatus: Boolean){
+        coffeeMachineStatus = newStatus
+        if(isActivityActive){
+            runOnUiThread {
+                setLayoutStyleForCurrentStatus()
+            }
+        } else {
+            runOnUiThread {
+                showNotification()
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         isActivityActive = true
@@ -121,6 +119,5 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        handler.removeCallbacks(runnable)
     }
 }
