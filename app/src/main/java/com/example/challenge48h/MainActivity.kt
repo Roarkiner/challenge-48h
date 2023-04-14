@@ -25,7 +25,6 @@ import com.google.gson.Gson
 class MainActivity : AppCompatActivity() {
     private var coffeeMachineStatus: Boolean = true
     private var isActivityActive: Boolean = true
-    private lateinit var webSocket: WebSocket
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,16 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         val listener = MachineWebSocketListener(this)
         val client = OkHttpClient()
-        webSocket = client.newWebSocket(request, listener)
-
-        val mainStatusButton = findViewById<Button>(R.id.change_status_button)
-
-        mainStatusButton.setOnClickListener {
-            if(coffeeMachineStatus)
-                webSocket.send("{data: 'down'}")
-            else
-                webSocket.send("{data: 'up'}")
-        }
+        client.newWebSocket(request, listener)
 
         requestNotificationPermission()
         setLayoutStyleForCurrentStatus()
@@ -57,7 +47,6 @@ class MainActivity : AppCompatActivity() {
         val mainContainer = findViewById<LinearLayout>(R.id.main_page_container)
         val mainIcon = findViewById<ImageView>(R.id.main_page_icon)
         val mainStatusText = findViewById<TextView>(R.id.main_page_status_text)
-        val mainStatusButton = findViewById<Button>(R.id.change_status_button)
 
         startRotationAnimation(mainIcon)
 
@@ -65,14 +54,10 @@ class MainActivity : AppCompatActivity() {
             mainContainer.setBackgroundColor(ContextCompat.getColor(this, R.color.green))
             mainIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_coffee))
             mainStatusText.text = "La machine est opérationnelle"
-            mainStatusButton.text = "Hors service"
-            mainStatusButton.backgroundTintList = ContextCompat.getColorStateList(this, R.color.red)
         } else {
             mainContainer.setBackgroundColor(ContextCompat.getColor(this, R.color.red))
             mainIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_coffee_invalid))
             mainStatusText.text = "La machine est en panne"
-            mainStatusButton.text = "Refonctionne"
-            mainStatusButton.backgroundTintList = ContextCompat.getColorStateList(this, R.color.green)
         }
     }
 

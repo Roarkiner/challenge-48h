@@ -28,12 +28,5 @@
             android:textStyle="bold"
             android:textAlignment="center"
             android:textSize="24dp"></TextView>
-        <Button
-            android:id="@+id/change_status_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:backgroundTint="@color/red"
-            android:text="Hors service"></Button>
     </LinearLayout>
 </LinearLayout>
