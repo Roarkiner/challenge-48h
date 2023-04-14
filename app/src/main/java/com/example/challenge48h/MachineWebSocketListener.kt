@@ -1,13 +1,13 @@
+package com.example.challenge48h
+
 import android.content.Context
 import android.util.Log
-import com.example.challenge48h.MachineStatusResponse
-import com.example.challenge48h.MainActivity
 import com.google.gson.Gson
 import okhttp3.*
 
 class MachineWebSocketListener(private val context : Context) : WebSocketListener() {
     override fun onOpen(webSocket: WebSocket, response: Response) {
-        Log.d("Debugging app", "Oppenned connection")
+        Log.d("Debugging app", "Opened connection")
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
