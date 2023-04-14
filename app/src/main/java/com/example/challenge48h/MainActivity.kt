@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private var coffeeMachineStatus: Int = 0
     private lateinit var handler: Handler
     private lateinit var runnable: Runnable
-    private var isActivityActive = true
+    private var isActivityActive: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         handler = Handler(Looper.getMainLooper())
         runnable = Runnable {
-            Log.d("Loop Occurence before", coffeeMachineStatus.toString())
             checkIfStatusHasChanged()
-            Log.d("Loop Occurence after", coffeeMachineStatus.toString())
             handler.postDelayed(runnable, 2000)
         }
 
@@ -76,6 +74,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showNotification(){
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancelAll()
         var notifIcon = R.drawable.ic_coffee_invalid
         var notifDesc = "La machine a café est en panne"
         if(coffeeMachineStatus == 1){
