@@ -16,6 +16,7 @@
             android:id="@+id/main_page_icon"
             android:layout_width="500px"
             android:layout_height="500px"
+            android:padding="50px"
             android:src="@drawable/ic_coffee">
         </ImageView>
         <TextView

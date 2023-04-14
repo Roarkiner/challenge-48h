@@ -1,21 +1,26 @@
 package com.example.challenge48h
 
-import MachineWebSocketListener
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.animation.AnimationUtils
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.WebSocket
 import java.text.SimpleDateFormat
 import java.util.*
+import com.google.gson.Gson
 
 class MainActivity : AppCompatActivity() {
     private var coffeeMachineStatus: Boolean = true
@@ -26,13 +31,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val request = Request.Builder()
-            .url("ws://192.168.78.102:8999")
+            .url("ws://144.24.199.103:8999")
             .build()
 
         val listener = MachineWebSocketListener(this)
         val client = OkHttpClient()
-        val webSocket = client.newWebSocket(request, listener)
+        client.newWebSocket(request, listener)
 
+        requestNotificationPermission()
         setLayoutStyleForCurrentStatus()
         createNotificationChannel()
     }
@@ -47,11 +53,11 @@ class MainActivity : AppCompatActivity() {
         if(coffeeMachineStatus){
             mainContainer.setBackgroundColor(ContextCompat.getColor(this, R.color.green))
             mainIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_coffee))
-            mainStatusText.text = "La machine a café fonctionne"
+            mainStatusText.text = "La machine est opérationnelle"
         } else {
             mainContainer.setBackgroundColor(ContextCompat.getColor(this, R.color.red))
             mainIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_coffee_invalid))
-            mainStatusText.text = "La machine a café ne fonctionne pas"
+            mainStatusText.text = "La machine est en panne"
         }
     }
 
@@ -109,7 +115,6 @@ class MainActivity : AppCompatActivity() {
         isActivityActive = true
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancelAll()
-
     }
 
     override fun onPause() {
@@ -117,7 +122,20 @@ class MainActivity : AppCompatActivity() {
         isActivityActive = false
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            if (!notificationManager.areNotificationsEnabled()) {
+                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                startActivity(intent)
+            }
+        } else {
+            if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                startActivity(intent)
+            }
+        }
     }
 }
