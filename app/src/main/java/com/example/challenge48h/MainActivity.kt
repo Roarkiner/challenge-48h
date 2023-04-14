@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val request = Request.Builder()
-            .url("ws://192.168.78.102:8999")
+            .url("ws://144.24.199.103:8999")
             .build()
 
         val listener = MachineWebSocketListener(this)
